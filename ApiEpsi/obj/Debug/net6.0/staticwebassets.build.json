@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "6NQxok6EATyiXDWYLfHyNMsME5ZjDZIXDVIBprSxcvY=",
+  "Source": "ApiEpsi",
+  "BasePath": "_content/ApiEpsi",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}
