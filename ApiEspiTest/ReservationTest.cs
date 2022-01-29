@@ -48,27 +48,32 @@ namespace ApiEspiTest
         public void Test_GETAReservations_Ok()
         {
             int id = 1;
-            var mockRepo = new Mock<IManage>();
-            mockRepo.Setup(repo => repo[It.IsAny<int>()]).Returns<int>((id) => Single(id));
-            var controller = new ReservationController(mockRepo.Object);
+            var mockManage = new Mock<IManage>(MockBehavior.Strict);
+            mockManage.Setup(repo => repo[It.IsAny<int>()]).Returns<int>((id) => Single(id));
+            var controller = new ReservationController(mockManage.Object);
 
             var result = controller.Get(id);
 
             Action action = () => result.Value.Should().Be(HttpStatusCode.OK);
 
+            mockManage.Verify(x => x[id]);
+            mockManage.VerifyNoOtherCalls();
         }
 
         [Fact]
         public void Test_GETAReservations_NotFound()
         {
             int id = 4;
-            var mockRepo = new Mock<IManage>();
-            mockRepo.Setup(repo => repo[It.IsAny<int>()]).Returns<int>((id) => Single(id));
-            var controller = new ReservationController(mockRepo.Object);
+            var mockManage = new Mock<IManage>(MockBehavior.Strict);
+            mockManage.Setup(repo => repo[It.IsAny<int>()]).Returns<int>((id) => Single(id));
+            var controller = new ReservationController(mockManage.Object);
 
             var result = controller.Get(id);
 
             Action action = () => result.Value.Should().Be(HttpStatusCode.NotFound);
+
+            mockManage.Verify(x => x[id]);
+            mockManage.VerifyNoOtherCalls();
         }
 
         [Fact]
@@ -81,9 +86,9 @@ namespace ApiEspiTest
                 DateDebut = "DD5",
                 DateFin = "DF5"
             };
-            var mockRepo = new Mock<IManage>();
-            mockRepo.Setup(repo => repo.AddReservation(It.IsAny<Reservation>())).Returns(r);
-            var controller = new ReservationController(mockRepo.Object);
+            var mockManage = new Mock<IManage>();
+            mockManage.Setup(repo => repo.AddReservation(It.IsAny<Reservation>())).Returns(r);
+            var controller = new ReservationController(mockManage.Object);
 
             var result = controller.Post(r);
 
@@ -94,6 +99,51 @@ namespace ApiEspiTest
                 result.DateDebut.Should().Be("DD5");
                 result.DateFin.Should().Be("DF5");
             }
+   
+            mockManage.Verify(mockManage => mockManage.AddReservation(It.IsAny<Reservation>()));
+            mockManage.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public void Test_PUTUpdateReservation()
+        {
+            Reservation r = new Reservation()
+            {
+                Id = 3,
+                Nom = "new name",
+                DateDebut = "DDNew",
+                DateFin = "DFNew"
+            };
+            var mockManage = new Mock<IManage>(MockBehavior.Strict);
+            mockManage.Setup(repo => repo.UpdateReservation(It.IsAny<Reservation>())).Returns(r);
+            var controller = new ReservationController(mockManage.Object);
+
+            var result = controller.Put(r);
+
+            using (new AssertionScope())
+            {
+                result.Id.Should().Be(3);
+                result.Nom.Should().Be("new name");
+                result.DateDebut.Should().Be("DDNew");
+                result.DateFin.Should().Be("DFNew");
+            }
+
+            mockManage.Verify(x => x.UpdateReservation(It.IsAny<Reservation>()));
+            mockManage.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public void Test_DeleteReservation()
+        {
+            // Arrange
+            var mockManage = new Mock<IManage>(MockBehavior.Strict);
+            mockManage.Setup(repo => repo.DeleteReservation(It.IsAny<int>()));
+            var controller = new ReservationController(mockManage.Object);
+
+            controller.Delete(3);
+
+            mockManage.Verify(x => x.DeleteReservation(It.IsAny<int>()));
+            mockManage.VerifyNoOtherCalls();
         }
         #region Methods private
         private static Reservation Single(int id)
