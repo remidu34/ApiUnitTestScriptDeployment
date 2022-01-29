@@ -145,7 +145,7 @@ namespace ApiEspiTest
             mockManage.Verify(x => x.DeleteReservation(It.IsAny<int>()));
             mockManage.VerifyNoOtherCalls();
         }
-        #region Methods private
+        #region Methods static
         private static Reservation Single(int id)
         {
             IEnumerable<Reservation> reservations = Multiple();
